@@ -22,11 +22,15 @@ class MVPController:
     def calc_view_projection(self):
         # 3. Implement the direction, right and up vectors here.
         # Currently none of them are correct
-        self.direction = glm.vec3(-1, -1, 2)
-        self.up = glm.vec3(0, -1, 0)
-        self.right = glm.vec3(0, 1, 0)
+        x = math.cos(self.yaw) * math.cos(self.pitch)
+        y = math.sin(self.pitch)
+        z = math.sin(self.yaw) * math.cos(self.pitch)
+        self.direction = glm.normalize(glm.vec3(x, y, z))
+        self.up = glm.vec3(0, 1, 0)
+        self.right = glm.normalize(glm.cross(self.up, self.direction))
+        self.up = glm.cross(self.direction, self.right)
         self.view_matrix = glm.lookAt(self.position,
-                          self.position + self.direction,
+                          self.position - self.direction,
                           self.up)
 
         self.projection_matrix = glm.perspective(glm.radians(self.fov), self.width / self.height, 0.1, 1000)
@@ -34,12 +38,18 @@ class MVPController:
     def on_keyboard(self, key: bytes, x: int, y: int):
         # 4. Set the corresponding actions based on the key here
 
-
-
-
-
-
-
+        if key == b"w": # forward
+            self.position -= self.speed * self.direction
+        if key == b"s": # back
+            self.position += self.speed * self.direction
+        if key == b"a": # left
+            self.position -= self.speed * self.right
+        if key == b"d": # right
+            self.position += self.speed * self.right
+        if key == b"r": # up
+            self.position += self.speed * self.up
+        if key == b"f": # down
+            self.position -= self.speed * self.up
 
         self.calc_view_projection()
         self.callback_update()
