@@ -83,7 +83,7 @@ class Win(GlutWindow):
 		self.model_matrix = glm.mat4(1)
 		# 2. Add code here to make the object rotate
 		angle = (time.time() - start_time) * 0.01
-		self.model_matrix = glm.rotate(self.model_matrix, glm.degrees(angle), glm.vec3(0, 1, 0))
+		self.model_matrix = glm.rotate(self.model_matrix, glm.degrees(angle), glm.vec3(1, 0, 0))
 
 
 
