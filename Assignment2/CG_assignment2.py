@@ -264,6 +264,43 @@ class Win(GlutWindow):
 		load an external object instead of drawing one with raw triangle.
 		'''
 
+                self.shader_program = self.init_shaders()
+
+                self.context.mvp_location = glGetUniformLocation(self.shader_program, "mvp")
+                self.context.texture_location = glGetUniformLocation(self.shader_program,
+                                                                     "texture_sampler")
+
+                texture = TextureLoader("resources/object/uvmap.png")
+                model = ObjLoader("resources/object/cube.obj").to_array_style()
+                vertex_buffer_data = model.vertexs
+                uv_buffer_data = model.texcoords
+
+                self.context.textureGLID = texture.textureGLID
+
+                self.context.vertexbuffer  = glGenBuffers(1)
+                glBindBuffer(GL_ARRAY_BUFFER, self.context.vertexbuffer)
+                glBufferData(
+                        GL_ARRAY_BUFFER,
+                        len(vertex_buffer_data) * 4,
+                        (GLfloat * len(vertex_buffer_data))(*vertex_buffer_data),
+                        GL_STATIC_DRAW
+                )
+
+                if texture.inversedVCoords:
+                        for index in range(len(uv_buffer_data)):
+                                if(index % 2):
+                                        uv_buffer_data[index] = 1.0 - uv_buffer_data[index]
+
+                self.context.texturebuffer = glGenBuffers(1)
+                glBindBuffer(GL_ARRAY_BUFFER, self.context.texturebuffer)
+                glBufferData(
+                        GL_ARRAY_BUFFER,
+                        len(uv_buffer_data) * 4,
+                        (GLfloat * len(uv_buffer_data))(*uv_buffer_data),
+                        GL_STATIC_DRAW
+                )
+
+
 
 
         def calc_mvp(self):
@@ -317,6 +354,6 @@ if __name__ == "__main__":
         win.controller = MVPController(win.update_if, width=win.width, height=win.height)
         win.init_opengl()
 
-        #win.init_context_load()
-        win.init_context_raw()
+        win.init_context_load()
+        # win.init_context_raw()
         win.run()
