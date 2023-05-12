@@ -246,7 +246,7 @@ class Win(GlutWindow):
 
         # Moon
         glBindTexture(GL_TEXTURE_2D, self.context.texture_moon.id)
-        mvp_stack[-1] = glm.scale(mvp_stack[-1], 1.27 * glm.vec3(1, 1, 1))
+        mvp_stack[-1] = glm.scale(mvp_stack[-1], 0.27 * glm.vec3(1, 1, 1))
         mvp_stack[-1] = glm.translate(mvp_stack[-1], glm.vec3(-5, 0, 3))
         self.model_matrix = glm.rotate(mvp_stack[-1], angle / 27.3, glm.vec3(0, 1, 0))
         self.calc_mvp()
