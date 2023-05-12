@@ -175,15 +175,15 @@ class Win(GlutWindow):
             (GLushort * len(ico_inds))(*ico_inds),
             GL_STATIC_DRAW
         )
-        
+
         glEnableVertexAttribArray(0)
         # 0th attribute, 3 numbers, floats, normalized=False, stride = 3 attributes * 3 numbers * 4 bytes
         #, offset = c pointer 2 attributes * 3 numbers * 4 bytes
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Vertex.sizeof, None)
-        
+
         glEnableVertexAttribArray(1)
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Vertex.sizeof, ctypes.c_void_p(3 * 4))
-        
+
         glEnableVertexAttribArray(2)
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Vertex.sizeof, ctypes.c_void_p(3 * 4 + 2 * 4))
 
@@ -202,20 +202,20 @@ class Win(GlutWindow):
     def draw(self):
         """
         The main drawing function. Is called whenever an update occurs.
-        
+
         Please implement the codes of Task 2, Task 3 and Task 4 described in our tutorial document.
-        
+
         Task 2: Draw the moon.
-        
+
         Task 3: The rotation of the sun, earth and moon.
-        
+
         Task 4: The revolution of the earth and moon. 
-        
+
         """
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glUseProgram(self.shader_program)
         mvp_stack = []
-        
+
         # Sun
         mvp_stack.append(glm.mat4(1.0))
         self.model_matrix = mvp_stack[-1]
@@ -229,7 +229,7 @@ class Win(GlutWindow):
         glUniform3f(self.context.color_location, 1, 1, 0)
         glUniform1f(self.context.light_bool_location, -1.0)
         glDrawElements(GL_TRIANGLES, len(ico_inds), GL_UNSIGNED_SHORT, None)
-        
+
         # Earth
         glBindTexture(GL_TEXTURE_2D, self.context.texture_earth.id)
         mvp_stack[-1] = glm.scale(mvp_stack[-1], 0.1 * glm.vec3(1, 1, 1))
@@ -243,8 +243,17 @@ class Win(GlutWindow):
         glDrawElements(GL_TRIANGLES, len(ico_inds), GL_UNSIGNED_SHORT, None)
 
         # Moon
+        glBindTexture(GL_TEXTURE_2D, self.context.texture_moon.id)
+        mvp_stack[-1] = glm.scale(mvp_stack[-1], 0.27 * glm.vec3(1, 1, 1))
+        mvp_stack[-1] = glm.translate(mvp_stack[-1], glm.vec3(-5, 0, 3))
+        self.model_matrix = mvp_stack[-1]
+        self.calc_mvp()
+        glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
+        glUniformMatrix4fv(self.context.m_location, 1, GL_FALSE, glm.value_ptr(self.model_matrix))
+        glUniform3f(self.context.color_location, 0, 0, 1)
+        glUniform1f(self.context.light_bool_location, 1.0)
+        glDrawElements(GL_TRIANGLES, len(ico_inds), GL_UNSIGNED_SHORT, None)
 
-        
         glUseProgram(0)
 
 
