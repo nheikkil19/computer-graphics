@@ -215,10 +215,12 @@ class Win(GlutWindow):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glUseProgram(self.shader_program)
         mvp_stack = []
+        angle = (time.time() - start_time) * 8
 
         # Sun
         mvp_stack.append(glm.mat4(1.0))
-        self.model_matrix = mvp_stack[-1]
+        # mvp_stack[-1] = glm.rotate(mvp_stack[-1], glm.degrees(angle), glm.vec3(0, 1, 0))
+        self.model_matrix = glm.rotate(mvp_stack[-1], angle / 27, glm.vec3(0, 1, 0))
         self.calc_mvp()
         glBindTexture(GL_TEXTURE_2D, self.context.texture_sun.id)
         glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
@@ -234,7 +236,7 @@ class Win(GlutWindow):
         glBindTexture(GL_TEXTURE_2D, self.context.texture_earth.id)
         mvp_stack[-1] = glm.scale(mvp_stack[-1], 0.1 * glm.vec3(1, 1, 1))
         mvp_stack[-1] = glm.translate(mvp_stack[-1], glm.vec3(-20, 0, 3))
-        self.model_matrix = mvp_stack[-1]
+        self.model_matrix = glm.rotate(mvp_stack[-1], angle, glm.vec3(0, 1, 0))
         self.calc_mvp()
         glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
         glUniformMatrix4fv(self.context.m_location, 1, GL_FALSE, glm.value_ptr(self.model_matrix))
@@ -244,9 +246,9 @@ class Win(GlutWindow):
 
         # Moon
         glBindTexture(GL_TEXTURE_2D, self.context.texture_moon.id)
-        mvp_stack[-1] = glm.scale(mvp_stack[-1], 0.27 * glm.vec3(1, 1, 1))
+        mvp_stack[-1] = glm.scale(mvp_stack[-1], 1.27 * glm.vec3(1, 1, 1))
         mvp_stack[-1] = glm.translate(mvp_stack[-1], glm.vec3(-5, 0, 3))
-        self.model_matrix = mvp_stack[-1]
+        self.model_matrix = glm.rotate(mvp_stack[-1], angle / 27.3, glm.vec3(0, 1, 0))
         self.calc_mvp()
         glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
         glUniformMatrix4fv(self.context.m_location, 1, GL_FALSE, glm.value_ptr(self.model_matrix))
