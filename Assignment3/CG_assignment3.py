@@ -216,11 +216,8 @@ class Win(GlutWindow):
         glUseProgram(self.shader_program)
         mvp_stack = []
         day = 0.1                     # seconds
-        # spin = 365 * 27
         spin = (time.time() - start_time) * (360/day)   # earth spin angle
-        rev = spin / 365                              # earth around sun angle
-        # if time.time() % 5:
-        #     print(rev)
+        rev = spin / 365                                # earth around sun angle
 
         # Sun
         mvp_stack.append(glm.mat4(1.0))
