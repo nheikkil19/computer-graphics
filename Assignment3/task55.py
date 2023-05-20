@@ -2,7 +2,7 @@ from OpenGL.GL import *
 
 import glm
 from utils.glut_window import GlutWindow
-from utils.mvp_controller import MVPController
+from utils.mvp_controller_task5 import MVPController
 from OpenGL.GL import shaders
 import random
 import time
@@ -62,6 +62,7 @@ class Win(GlutWindow):
     def __init__(self, width: int = 800, height: int = 480):
         super().__init__(width, height)
         self.context = GLContext()
+        self.model_matrix = glm.mat4(1.0)
 
     def init_context(self):
         # Read shader files and compile them
@@ -96,6 +97,8 @@ class Win(GlutWindow):
             GL_STATIC_DRAW,
         )
 
+
+
     def calc_mvp(self):
         self.calc_model()
         self.context.mvp = self.controller.calc_mvp(self.model_matrix)
@@ -105,7 +108,7 @@ class Win(GlutWindow):
         self.calc_mvp()
 
     def calc_model(self):
-        self.model_matrix = glm.mat4(1)
+        pass
 
 
 
@@ -118,40 +121,51 @@ class Win(GlutWindow):
         glUseProgram(self.shader_program)
         mvp_stack = []
 
-
-        # Draw the first box
-        mvp_stack.append(glm.mat4(1))
-        # self.model_matrix = glm.translate(self.model_matrix, glm.vec3(0, 0, 0))
-        # self.model_matrix = glm.rotate()
-        # self.model_matrix = glm.scale(self.model_matrix, glm.vec3(1, 1, 1))
-        self.model_matrix = mvp_stack[-1]
-        glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
-        # glUniformMatrix4fv(self.context.m_location, 1, GL_FALSE, glm.value_ptr(self.model_matrix))
-        # glUniformMatrix4fv(self.context.v_location, 1, GL_FALSE, glm.value_ptr(self.controller.view_matrix))
-        # light_view = self.controller.view_matrix * (self.model_matrix * self.light_position)
-        # glUniform4fv(self.context.light_location, 1, glm.value_ptr(light_view))
-        # glUniform3f(self.context.color_location, 1, 1, 0)
-        # glUniform1f(self.context.light_bool_location, -1.0)
-
-
         glEnableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, self.context.vertex_buffer)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+        glEnableVertexAttribArray(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self.context.color_buffer)
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
 
-        # glEnableVertexAttribArray(1)
-        # glBindBuffer(GL_ARRAY_BUFFER, self.context.color_buffer)
-        # glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
+        # Draw three boxes next to each other
 
+        # Draw the first box
+        mvp_stack.append(glm.mat4(1))
+        self.model_matrix = mvp_stack[-1]
+        self.calc_mvp()
+        glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
+        glDrawArrays(GL_TRIANGLES, 0, len(vertex_buffer_data))
+
+        # Draw the second box next to the first
+        mvp_stack.append(glm.translate(mvp_stack[-1], glm.vec3(-2, 0, 0)))
+        self.model_matrix = mvp_stack[-1]
+        self.calc_mvp()
+        glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
+        glDrawArrays(GL_TRIANGLES, 0, len(vertex_buffer_data))
+
+        # Draw the third box next to the second
+        mvp_stack.append(glm.translate(mvp_stack[-1], glm.vec3(4, 0, 0)))
+        self.model_matrix = mvp_stack[-1]
+        self.calc_mvp()
+        glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
         glDrawArrays(GL_TRIANGLES, 0, len(vertex_buffer_data))
 
         glDisableVertexAttribArray(0)
-        # glDisableVertexAttribArray(1)
+        glDisableVertexAttribArray(1)
+
         glUseProgram(0)
+
+
 
 
 if __name__ == "__main__":
     win = Win()
     win.controller = MVPController(win.update_if, width=win.width, height=win.height)
+    win.controller.position = glm.vec3(0, 0, 10)
+    win.controller.pitch = 0
+    win.controller.yaw = 0
+    win.controller.calc_view_projection()
     win.init_opengl()
     win.init_context()
     win.run()
