@@ -4,6 +4,7 @@ import glm
 from utils.glut_window import GlutWindow
 from utils.mvp_controller import MVPController
 import random
+from OpenGL.GL import shaders
 
 vertex_buffer_data = [
     -1, +0, -1, +1, +0, -1, -1, +0, +1,  # Base 0
@@ -16,6 +17,12 @@ vertex_buffer_data = [
 
 color_buffer_data = [random.random() for _ in range(len(vertex_buffer_data))]
 
+
+def read_file(file_path: str) -> str:
+    """Reads a text file given a path and returns it as a string."""
+    with open(file_path, mode="r") as f:
+        contents = f.readlines()
+    return contents
 
 class GLContext:
     """Used for storing context data in the main window."""
@@ -31,6 +38,14 @@ class Win(GlutWindow):
         self.model_matrix = glm.mat4(1.0)
 
     def init_context(self):
+        vertex_shader_string = read_file("shaders/vertex_shader_copy.glsl")
+        fragment_shader_string = read_file("shaders/fragment_shader_copy.glsl")
+        vertex_shader = shaders.compileShader(vertex_shader_string, GL_VERTEX_SHADER)
+        fragment_shader = shaders.compileShader(
+            fragment_shader_string, GL_FRAGMENT_SHADER
+        )
+        self.shader_program = shaders.compileProgram(vertex_shader, fragment_shader)
+
         # Get location of the MVP matrix
         self.context.mvp_location = glGetUniformLocation(
             self.shader_program, "MVP")        # Generate buffers for vertices and color data and buffer the data

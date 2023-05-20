@@ -8,14 +8,14 @@ import random
 import time
 
 # Define eight vertices
-v1 = (-1, -2, +1)
-v2 = (+1, -2, +1)
-v3 = (+1, +2, +1)
-v4 = (-1, +2, +1)
-v5 = (-1, +2, -1)
-v6 = (-1, -2, -1)
-v7 = (+1, -2, -1)
-v8 = (+1, +2, -1)
+v1 = (-1, -1, +1)
+v2 = (+1, -1, +1)
+v3 = (+1, +1, +1)
+v4 = (-1, +1, +1)
+v5 = (-1, +1, -1)
+v6 = (-1, -1, -1)
+v7 = (+1, -1, -1)
+v8 = (+1, +1, -1)
 
 # Define a box using triangles
 vertex_buffer_data = [
@@ -130,22 +130,24 @@ class Win(GlutWindow):
 
         # Draw three boxes next to each other
 
-        # Draw the first box
+        # Draw the first box (body)
         mvp_stack.append(glm.mat4(1))
+        mvp_stack[-1] = glm.scale(mvp_stack[-1], glm.vec3(2, 4, 2))
         self.model_matrix = mvp_stack[-1]
         self.calc_mvp()
         glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
         glDrawArrays(GL_TRIANGLES, 0, len(vertex_buffer_data))
 
-        # Draw the second box next to the first
-        mvp_stack.append(glm.translate(mvp_stack[-1], glm.vec3(-2, 0, 0)))
+        # Draw the second box (left leg)
+        mvp_stack.append(glm.translate(mvp_stack[-1], glm.vec3(-1, -2, 0)))
+        glm.scale(mvp_stack[-1], glm.vec3(2, 4, 2))
         self.model_matrix = mvp_stack[-1]
         self.calc_mvp()
         glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
         glDrawArrays(GL_TRIANGLES, 0, len(vertex_buffer_data))
 
-        # Draw the third box next to the second
-        mvp_stack.append(glm.translate(mvp_stack[-1], glm.vec3(4, 0, 0)))
+        # Draw the third box (right leg)
+        mvp_stack.append(glm.translate(mvp_stack[-2], glm.vec3(1, -2, 0)))
         self.model_matrix = mvp_stack[-1]
         self.calc_mvp()
         glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
