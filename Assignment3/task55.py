@@ -6,6 +6,7 @@ from utils.mvp_controller_task5 import MVPController
 from OpenGL.GL import shaders
 import random
 import time
+import math
 
 # Define eight vertices
 v1 = (-1, -1, +1)
@@ -129,25 +130,41 @@ class Win(GlutWindow):
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
 
         # Draw three boxes next to each other
+        body_width = 2
+        body_height = 4
+        body_depth = 2
+
+        leg_width = 0.5
+        leg_height = 2
+        leg_depth = 0.5
+
+        upper_leg_angle = math.sin(time.time() - start_time) * 45
+        lower_leg_angle = math.sin(time.time() - start_time) * 45
 
         # Draw the first box (body)
         mvp_stack.append(glm.mat4(1))
-        mvp_stack[-1] = glm.scale(mvp_stack[-1], glm.vec3(2, 4, 2))
+        mvp_stack[-1] = glm.translate(mvp_stack[-1], glm.vec3(0, 1, 0))         # move origin to the center bottom of the box
+        self.model_matrix = glm.scale(mvp_stack[-1], glm.vec3(body_width, body_height, body_depth))
+        self.calc_mvp()
+        glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
+        glDrawArrays(GL_TRIANGLES, 0, len(vertex_buffer_data))
+
+        # Draw the second box (upper leg)
+        mvp_stack.append(glm.translate(mvp_stack[-1], glm.vec3(0, 0, 0)))      # dont move
+        # Rotate leg around the origin
+        mvp_stack[-1] = glm.rotate(mvp_stack[-1], glm.radians(upper_leg_angle), glm.vec3(0, 0, 1))
+        mvp_stack[-1] = glm.scale(mvp_stack[-1], glm.vec3(leg_width, leg_height, leg_depth))                     
         self.model_matrix = mvp_stack[-1]
         self.calc_mvp()
         glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
         glDrawArrays(GL_TRIANGLES, 0, len(vertex_buffer_data))
 
-        # Draw the second box (left leg)
-        mvp_stack.append(glm.translate(mvp_stack[-1], glm.vec3(-1, -2, 0)))
-        glm.scale(mvp_stack[-1], glm.vec3(2, 4, 2))
-        self.model_matrix = mvp_stack[-1]
-        self.calc_mvp()
-        glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
-        glDrawArrays(GL_TRIANGLES, 0, len(vertex_buffer_data))
-
-        # Draw the third box (right leg)
-        mvp_stack.append(glm.translate(mvp_stack[-2], glm.vec3(1, -2, 0)))
+        # Draw the third box (lower leg)
+        # Move leg to the bottom of the upper leg
+        mvp_stack.append(glm.translate(mvp_stack[-1], glm.vec3(0, -leg_height, 0)))
+        # Rotate leg around the origin
+        mvp_stack[-1] = glm.rotate(mvp_stack[-1], glm.radians(lower_leg_angle), glm.vec3(0, 0, 1))
+        # mvp_stack[-1] = glm.scale(mvp_stack[-1], glm.vec3(leg_width, leg_height, leg_depth))
         self.model_matrix = mvp_stack[-1]
         self.calc_mvp()
         glUniformMatrix4fv(self.context.mvp_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
