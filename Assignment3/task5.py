@@ -188,7 +188,6 @@ class Win(GlutWindow):
         glUniformMatrix4fv(self.model_view_matrix_location, 1, GL_FALSE, glm.value_ptr(self.controller.view_matrix))
         glUniformMatrix4fv(self.projection_matrix_location, 1, GL_FALSE, glm.value_ptr(self.controller.projection_matrix))
         glUniformMatrix4fv(self.model_matrix_location, 1, GL_FALSE, glm.value_ptr(self.model_matrix))
-        # glUniformMatrix4fv(self.mvp_matrix_location, 1, GL_FALSE, glm.value_ptr(self.context.mvp))
         glUniform4f(self.ambient_product_location, body_ambient_product.x, body_ambient_product.y, body_ambient_product.z, body_ambient_product.w)
         glUniform4f(self.diffuse_product_location, body_diffuse_product.x, body_diffuse_product.y, body_diffuse_product.z, body_diffuse_product.w)
         glUniform4f(self.specular_product_location, body_specular_product.x, body_specular_product.y, body_specular_product.z, body_specular_product.w)
